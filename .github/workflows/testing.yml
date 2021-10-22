@@ -8,10 +8,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: docker/setup-qemu-action@v1
-        with:
-          image: tonistiigi/binfmt:latest
-          platforms: avr
+      - run: |
+          wget https://download.qemu.org/qemu-6.1.0.tar.xz
+          tar xvJf qemu-6.1.0.tar.xz
+          cd qemu-6.1.0
+          ./configure --target-list="avr-softmmu"  --prefix=/usr
+          sudo ldconfig
+          make -j $(($(nproc)*4))
+          make -j $(($(nproc)*4)) install
+          cd ..
       - run: |
           cd python/QEMU_arduino_serial_testing/
           python -u -m unittest discover -v
